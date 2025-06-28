@@ -533,8 +533,8 @@ const faqDatabase = [
     }
 ];
 
-    const API_KEY = "AIzaSyDDkokebkCwrK7irc5ZYX3af8DFuqanfbU";
-    const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+    const API_KEY = "";
+    const API_URL = ``;
 
     let conversationHistory = [];
     
