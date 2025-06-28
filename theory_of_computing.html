@@ -3,388 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
     <title>DeKUT Smart FAQ Assistant</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #0a0a0a;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-        }
-
-        /* Premium Animated Background */
-        body::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #16213e 75%, #1a1a2e 100%);
-            background-size: 400% 400%;
-            animation: gradientShift 8s ease infinite;
-            z-index: -2;
-        }
-
-        /* Geometric Pattern Overlay */
-        body::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                radial-gradient(circle at 25% 25%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 75% 75%, rgba(255, 215, 0, 0.05) 0%, transparent 50%),
-                linear-gradient(45deg, transparent 40%, rgba(255, 215, 0, 0.02) 50%, transparent 60%);
-            background-size: 100px 100px, 150px 150px, 50px 50px;
-            animation: patternMove 20s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        @keyframes patternMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
-        }
-
-        .chatbot-container {
-            width: 90%;
-            max-width: 900px;
-            height: 85vh;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 24px;
-            box-shadow: 
-                0 25px 50px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(255, 215, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            position: relative;
-        }
-
-        .chatbot-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.5), transparent);
-            animation: shimmer 3s ease-in-out infinite;
-        }
-
-        @keyframes shimmer {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
-        }
-
-        .chat-header {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.05) 100%);
-            color: #ffffff;
-            padding: 24px;
-            text-align: center;
-            position: relative;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
-        }
-
-        .header-title {
-            font-size: 1.8em;
-            font-weight: 700;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #ffd700, #ffffff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: titleGlow 2s ease-in-out infinite alternate;
-        }
-
-        .header-subtitle {
-            font-size: 0.9em;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 300;
-        }
-
-        @keyframes titleGlow {
-            0% { filter: brightness(1); }
-            100% { filter: brightness(1.2); }
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-            background: rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
-
-        .chat-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 3px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(255, 215, 0, 0.3);
-            border-radius: 3px;
-        }
-
-        .message {
-            margin-bottom: 20px;
-            display: flex;
-            align-items: flex-start;
-            animation: messageSlide 0.5s ease-out;
-        }
-
-        .message.user {
-            justify-content: flex-end;
-        }
-
-        @keyframes messageSlide {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .message-content {
-            max-width: 75%;
-            padding: 16px 20px;
-            border-radius: 20px;
-            word-wrap: break-word;
-            line-height: 1.5;
-            position: relative;
-            font-weight: 400;
-        }
-
-        .message.bot .message-content {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(255, 215, 0, 0.05) 100%);
-            color: #ffffff;
-            border-bottom-left-radius: 6px;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.1);
-        }
-
-        .message.user .message-content {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
-            color: #ffffff;
-            border-bottom-right-radius: 6px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .message-label {
-            font-size: 0.75em;
-            margin: 0 12px 6px;
-            color: rgba(255, 215, 0, 0.8);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .input-container {
-            padding: 24px;
-            background: rgba(0, 0, 0, 0.2);
-            border-top: 1px solid rgba(255, 215, 0, 0.2);
-            display: flex;
-            gap: 12px;
-        }
-
-        .message-input {
-            flex: 1;
-            padding: 16px 20px;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            border-radius: 25px;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.05);
-            color: #ffffff;
-            font-family: 'Inter', sans-serif;
-            backdrop-filter: blur(10px);
-        }
-
-        .message-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .message-input:focus {
-            border-color: #ffd700;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .send-button {
-            padding: 16px 24px;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            color: #1a1a2e;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
-            font-family: 'Inter', sans-serif;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .send-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-            transition: left 0.5s;
-        }
-
-        .send-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
-        }
-
-        .send-button:hover::before {
-            left: 100%;
-        }
-
-        .send-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .typing-indicator {
-            display: none;
-            padding: 12px 20px;
-            background: rgba(255, 215, 0, 0.1);
-            border-radius: 20px;
-            border-bottom-left-radius: 6px;
-            color: rgba(255, 255, 255, 0.8);
-            font-style: italic;
-            max-width: 70%;
-            border: 1px solid rgba(255, 215, 0, 0.2);
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
-        }
-
-        .faq-suggestions {
-            padding: 20px 24px;
-            background: rgba(255, 215, 0, 0.05);
-            border-top: 1px solid rgba(255, 215, 0, 0.1);
-            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
-        }
-
-        .faq-title {
-            font-size: 0.9em;
-            color: #ffd700;
-            margin-bottom: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .faq-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .faq-button {
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            color: #ffffff;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.85em;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .faq-button:hover {
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
-            border-color: #ffd700;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
-        }
-
-        .error-message {
-            color: #ff6b6b;
-            font-style: italic;
-        }
-
-        /* Floating particles animation */
-        .particle {
-            position: absolute;
-            background: rgba(255, 215, 0, 0.1);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: float 8s infinite ease-in-out;
-        }
-
-        .particle:nth-child(1) { width: 4px; height: 4px; top: 20%; left: 10%; animation-delay: 0s; }
-        .particle:nth-child(2) { width: 6px; height: 6px; top: 60%; left: 80%; animation-delay: 1s; }
-        .particle:nth-child(3) { width: 3px; height: 3px; top: 80%; left: 20%; animation-delay: 2s; }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
-            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
-        }
-
-        @media (max-width: 600px) {
-            .chatbot-container {
-                width: 95%;
-                height: 90vh;
-            }
-            
-            .message-content {
-                max-width: 85%;
-            }
-
-            .header-title {
-                font-size: 1.4em;
-            }
-
-            .faq-buttons {
-                justify-content: center;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <!-- Floating particles -->
@@ -392,13 +14,35 @@
     <div class="particle"></div>
     <div class="particle"></div>
 
-    <div class="chatbot-container">
-        <div class="chat-header">
+    <div class="chatbot-container" id="chatbotContainer">
+        <button class="focus-toggle" id="focusToggle" onclick="toggleFocusMode()">
+            <span id="focusToggleText">💬 Focus</span>
+        </button>
+
+        <!-- Logo Section -->
+        <div class="logo-container">
+            <img src="logo.png" alt="DeKUT Logo">
+        </div>
+
+        <div class="chat-header" id="chatHeader">
             <div class="header-title">🎓 DeKUT Smart Assistant</div>
             <div class="header-subtitle">Dedan Kimathi University of Technology</div>
+            
+            <div class="voice-controls">
+                <button class="voice-button" id="voiceModeToggle" onclick="toggleVoiceMode()">
+                    <span id="voiceModeIcon">🎤</span>
+                    <span id="voiceModeText">Enable Voice</span>
+                </button>
+                <button class="voice-button" id="autoSpeakToggle" onclick="toggleAutoSpeak()">
+                    <span>🔊</span>
+                    <span id="autoSpeakText">Auto Speak</span>
+                </button>
+            </div>
+            
+            <div class="voice-status" id="voiceStatus"></div>
         </div>
         
-        <div class="faq-suggestions">
+        <div class="faq-suggestions" id="faqSuggestions">
             <div class="faq-title">Quick Questions</div>
             <div class="faq-buttons">
                 <button class="faq-button" onclick="sendMessage('What programs does DeKUT offer?')">Programs</button>
@@ -415,7 +59,12 @@
                 <div>
                     <div class="message-label">DeKUT Assistant</div>
                     <div class="message-content">
-                        Welcome to Dedan Kimathi University of Technology! I'm here to help answer your questions about our programs, admissions, fees, and more. How can I assist you today?
+                        Welcome to Dedan Kimathi University of Technology! I'm here to help answer your questions about our programs, admissions, fees, and more. You can type your questions or use voice commands by clicking the microphone button. How can I assist you today?
+                        <div class="message-controls">
+                            <button class="speak-button" onclick="speakText(this)" data-text="Welcome to Dedan Kimathi University of Technology! I'm here to help answer your questions about our programs, admissions, fees, and more. You can type your questions or use voice commands by clicking the microphone button. How can I assist you today?">
+                                🔊
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -425,268 +74,26 @@
             Assistant is typing...
         </div>
         
-        <div class="input-container">
+        <div class="input-container" id="inputContainer">
             <input 
                 type="text" 
                 class="message-input" 
                 id="messageInput" 
-                placeholder="Ask me anything about DeKUT..."
+                placeholder="Ask me anything about DeKUT or click the microphone to speak..."
                 onkeypress="handleKeyPress(event)"
             >
-            <button class="send-button" id="sendButton" onclick="handleSendMessage()">
-                Send
-            </button>
+            <div class="input-buttons">
+                <button class="voice-input-button" id="voiceInputButton" onclick="toggleVoiceInput()" title="Voice Input">
+                    🎤
+                </button>
+                <button class="send-button" id="sendButton" onclick="handleSendMessage()">
+                    Send
+                </button>
+            </div>
         </div>
     </div>
 
-    <script>
-        // DeKUT FAQ Database with Regular Expressions
-        const faqDatabase = [
-            {
-                patterns: [
-                    /what\s+programs?\s+(does\s+dekut\s+offer|are\s+available)/i,
-                    /courses?\s+(offered|available)\s+at\s+dekut/i,
-                    /degrees?\s+at\s+dekut/i,
-                    /what\s+can\s+i\s+study\s+at\s+dekut/i,
-                    /faculties\s+at\s+dekut/i
-                ],
-                response: "DeKUT offers programs in **Engineering**, **Pure & Applied Sciences**, **Computing & Information Technology**, **Business & Management**, **Architecture & Built Environment**, and **Health Sciences**. Our programs include *certificates*, *diplomas*, *undergraduate* and *postgraduate* degrees across various specialized fields."
-            },
-            {
-                patterns: [
-                    /how\s+(do\s+i|can\s+i)\s+apply\s+to\s+dekut/i,
-                    /admission\s+process/i,
-                    /application\s+requirements/i,
-                    /how\s+to\s+join\s+dekut/i,
-                    /dekut\s+admission/i
-                ],
-                response: "To apply to DeKUT: **1)** Visit our official website at *dekut.ac.ke*, **2)** Create an account on the online application portal, **3)** Fill out the application form with your academic details, **4)** Upload required documents (certificates, ID copy, passport photo), **5)** Pay the application fee, and **6)** Submit your application. For specific program requirements, check our **admission guidelines**."
-            },
-            {
-                patterns: [
-                    /school\s+fees/i,
-                    /tuition\s+fees?/i,
-                    /how\s+much\s+(does\s+it\s+cost|to\s+study)/i,
-                    /dekut\s+fees/i,
-                    /cost\s+of\s+studying/i
-                ],
-                response: "DeKUT fees vary by program and level of study. **Government-sponsored** students pay different rates than **self-sponsored** students. For current fee structures, please visit our website at *dekut.ac.ke* or contact the Finance Office at **+254-61-2055000**. Fee payment can be made through *bank deposits*, *M-Pesa*, or *online banking*."
-            },
-            {
-                patterns: [
-                    /where\s+is\s+dekut\s+located/i,
-                    /dekut\s+location/i,
-                    /address\s+of\s+dekut/i,
-                    /how\s+to\s+get\s+to\s+dekut/i,
-                    /dekut\s+campus/i
-                ],
-                response: "DeKUT main campus is located in **Nyeri, Kenya**, along the Nyeri-Nairobi Highway. The postal address is *P.O. Box 657-10100, Nyeri*. We also have satellite campuses in **Nairobi CBD** and **Nakuru**. The university is easily accessible by public transport from major towns."
-            },
-            {
-                patterns: [
-                    /graduation\s+requirements/i,
-                    /how\s+to\s+graduate/i,
-                    /when\s+do\s+i\s+graduate/i,
-                    /graduation\s+ceremony/i,
-                    /completing\s+my\s+degree/i
-                ],
-                response: "To graduate from DeKUT, you must: **1)** Complete all required course units for your program, **2)** Achieve the minimum GPA requirement, **3)** Complete industrial attachment/internship where applicable, **4)** Submit your final project/thesis, **5)** Clear all financial obligations to the university, and **6)** have no pending disciplinary cases. Graduation ceremonies are held **twice a year**."
-            },
-            {
-                patterns: [
-                    /student\s+portal/i,
-                    /how\s+to\s+access\s+portal/i,
-                    /online\s+services/i,
-                    /student\s+account/i,
-                    /login\s+to\s+portal/i
-                ],
-                response: "The DeKUT Student Portal can be accessed at **portal.dekut.ac.ke**. Use your *admission number* as username and the password provided during registration. Through the portal, you can view your **academic progress**, **fee statements**, **course registration**, **exam results**, and access other student services. Contact ICT support if you have login issues."
-            },
-            {
-                patterns: [
-                    /accommodation|hostels?/i,
-                    /where\s+to\s+stay/i,
-                    /student\s+housing/i,
-                    /dekut\s+hostels?/i
-                ],
-                response: "DeKUT provides **on-campus accommodation** in various hostels with different pricing tiers. We have both *male* and *female* hostels with modern facilities. Application for accommodation is done through the **student portal**. **Off-campus housing** is also available in Nyeri town with various options to suit different budgets."
-            },
-            {
-                patterns: [
-                    /library\s+services/i,
-                    /dekut\s+library/i,
-                    /library\s+hours/i,
-                    /accessing\s+books/i
-                ],
-                response: "The DeKUT Library provides comprehensive academic resources including *physical books*, *e-books*, *journals*, and *digital databases*. Operating hours are **Monday-Friday: 8:00 AM - 10:00 PM**, **Saturday: 8:00 AM - 5:00 PM**, **Sunday: 2:00 PM - 8:00 PM**. Students can access online resources **24/7** through the library portal using their student credentials."
-            },
-            {
-                patterns: [
-                    /contact\s+(dekut|information)/i,
-                    /phone\s+number/i,
-                    /email\s+address/i,
-                    /how\s+to\s+reach\s+dekut/i
-                ],
-                response: "Contact DeKUT at: **Phone: +254-61-2055000**, **Email: info@dekut.ac.ke**, **Website: www.dekut.ac.ke**. For specific departments: *Admissions*: admissions@dekut.ac.ke, *Student Affairs*: studentaffairs@dekut.ac.ke, *Finance*: finance@dekut.ac.ke. Our offices are open **Monday-Friday: 8:00 AM - 5:00 PM**."
-            }
-        ];
+    <script src="script.js"></script>
 
-        // Gemini API Configuration
-        const API_KEY = "AIzaSyDDkokebkCwrK7irc5ZYX3af8DFuqanfbU";
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
-
-        let conversationHistory = [];
-
-        function checkFAQ(userMessage) {
-            const message = userMessage.toLowerCase().trim();
-            
-            for (let faq of faqDatabase) {
-                for (let pattern of faq.patterns) {
-                    if (pattern.test(message)) {
-                        return faq.response;
-                    }
-                }
-            }
-            return null;
-        }
-
-        async function getGeminiResponse(userMessage) {
-            try {
-                // Add context about DeKUT to the conversation
-                const contextualMessage = `As a Dedan Kimathi University of Technology (DeKUT) assistant, please answer this question: ${userMessage}. Provide accurate information about DeKUT specifically when possible.`;
-                
-                conversationHistory.push({
-                    role: "user",
-                    parts: [{ text: contextualMessage }]
-                });
-
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        contents: conversationHistory,
-                        generationConfig: {
-                            temperature: 0.7,
-                            topK: 40,
-                            topP: 0.95,
-                            maxOutputTokens: 1024,
-                        }
-                    })
-                });
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-                const aiResponse = data.candidates[0].content.parts[0].text;
-
-                conversationHistory.push({
-                    role: "model",
-                    parts: [{ text: aiResponse }]
-                });
-
-                return aiResponse;
-            } catch (error) {
-                console.error('Error calling Gemini API:', error);
-                return "I'm sorry, I'm having trouble connecting to my AI service right now. Please try again later or contact DeKUT directly at +254-61-2055000.";
-            }
-        }
-
-        function addMessage(content, isUser, isError = false) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-            
-            const contentClass = isError ? 'message-content error-message' : 'message-content';
-            
-            // Format text to handle markdown-style formatting
-            const formattedContent = formatText(content);
-            
-            messageDiv.innerHTML = `
-                <div>
-                    <div class="message-label">${isUser ? 'You' : 'DeKUT Assistant'}</div>
-                    <div class="${contentClass}">${formattedContent}</div>
-                </div>
-            `;
-            
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        }
-
-        function formatText(text) {
-            // Convert **text** to <strong>text</strong> (bold)
-            let formatted = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            
-            // Convert *text* to <em>text</em> (italic)
-            formatted = formatted.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<em>$1</em>');
-            
-            // Convert numbered lists (1) text, 2) text, etc.)
-            formatted = formatted.replace(/(\d+)\)\s/g, '<strong>$1)</strong> ');
-            
-            // Convert line breaks to <br>
-            formatted = formatted.replace(/\n/g, '<br>');
-            
-            return formatted;
-        }
-
-        function showTypingIndicator() {
-            document.getElementById('typingIndicator').style.display = 'block';
-            document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight;
-        }
-
-        function hideTypingIndicator() {
-            document.getElementById('typingIndicator').style.display = 'none';
-        }
-
-        async function sendMessage(message) {
-            if (!message) return;
-
-            addMessage(message, true);
-            document.getElementById('messageInput').value = '';
-            
-            const sendButton = document.getElementById('sendButton');
-            sendButton.disabled = true;
-
-            showTypingIndicator();
-
-            const faqResponse = checkFAQ(message);
-            
-            let response;
-            if (faqResponse) {
-                await new Promise(resolve => setTimeout(resolve, 800));
-                response = faqResponse;
-            } else {
-                response = await getGeminiResponse(message);
-            }
-
-            hideTypingIndicator();
-            addMessage(response, false);
-
-            sendButton.disabled = false;
-            document.getElementById('messageInput').focus();
-        }
-
-        function handleSendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-            if (message) {
-                sendMessage(message);
-            }
-        }
-
-        function handleKeyPress(event) {
-            if (event.key === 'Enter' && !event.shiftKey) {
-                event.preventDefault();
-                handleSendMessage();
-            }
-        }
-
-        window.onload = function() {
-            document.getElementById('messageInput').focus();
-        };
-    </script>
 </body>
 </html>
